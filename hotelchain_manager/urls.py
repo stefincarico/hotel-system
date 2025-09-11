@@ -16,7 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from gestione_hotel.views import homepage_view 
+from gestione_hotel.views import homepage_view, hotel_detail_view,hotel_create_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', homepage_view, name='homepage'),
+    path('hotel/<int:pk>/', hotel_detail_view, name='hotel_detail'),
+    path('hotel/nuovo/', hotel_create_view, name='hotel_create'),
 ]

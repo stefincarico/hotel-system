@@ -1,0 +1,43 @@
+<!-- templates/base.html -->
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Definiamo il nostro primo "buco" per il titolo -->
+    <title>{% block title %}HotelChain Manager{% endblock %}</title>
+    
+    <!-- In futuro qui metteremo i link ai file CSS -->
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        header, footer { text-align: center; padding: 1em 0; color: #555; }
+        hr { border: 1px solid #eee; }
+        a { color: #007BFF; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><a href="{% url 'homepage' %}">🏨 HotelChain Manager</a></h1>
+        <p>Il tuo sistema di gestione centralizzato</p>
+    </header>
+
+    <hr>
+
+    <main>
+        <!-- Definiamo il "buco" principale per il contenuto della pagina -->
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <hr>
+
+    <footer>
+        <p>&copy; 2025 - Corso Django Power</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Homepage - HotelChain Manager
+{% endblock %}
+
+{% block content %}
+    <!-- 👇 Aggiungiamo il link/bottone qui in alto! -->
+    <p>
+        <a href="{% url 'hotel_create' %}" style="font-weight: bold; font-size: 1.1em;">
+            ➕ Aggiungi Nuovo Hotel
+        </a>
+    </p>
+    <hr>
+    <h2>I nostri hotel attivi:</h2>
+
+    {% if hotels %}
+        <ul>
+            {% for hotel in hotels %}
+                <li>
+                    <strong>
+                        <a href="{% url 'hotel_detail' hotel.pk %}">
+                            {{ hotel.nome }}
+                        </a>
+                    </strong> - {{ hotel.indirizzo }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>😔 Al momento non ci sono hotel attivi da mostrare.</p>
+    {% endif %}
+{% endblock %}

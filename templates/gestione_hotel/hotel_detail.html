@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ hotel.nome }} - Dettagli
+{% endblock %}
+
+{% block content %}
+    <h2>🏨 Dettagli per: {{ hotel.nome }}</h2>
+    <p><strong>Indirizzo:</strong> {{ hotel.indirizzo }}</p>
+    <p><strong>Stato:</strong> {{ hotel.get_stato_display }}</p>
+
+    <hr>
+
+    <h3>🚪 Stanze disponibili in questo hotel:</h3>
+
+    {% if stanze %}
+        <ul>
+            {% for stanza in stanze %}
+                <li>
+                    Stanza N° {{ stanza.numero }} - Tipo: {{ stanza.get_tipologia_display }}
+                    {% if stanza.ha_problemi %}
+                        <strong style="color: red;">(⚠️ In Manutenzione)</strong>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>😔 Non ci sono stanze associate a questo hotel.</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'homepage' %}">⬅️ Torna alla lista degli hotel</a>
+{% endblock %}

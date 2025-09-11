@@ -2,15 +2,56 @@
 
 from django.db import models
 
-# Create your models here.
+# 👇 IL NOSTRO NUOVO MODELLO!
+class Hotel(models.Model):
+    # 👇 DEFINIAMO GLI STATI POSSIBILI
+    class StatoHotel(models.TextChoices):
+        ATTIVO = 'ATTIVO', 'Attivo'
+        CHIUSO = 'CHIUSO', 'Chiuso'
+        ARCHIVIATO = 'ARCHIVIATO', 'Archiviato'
+
+    nome = models.CharField(max_length=100, unique=True) # Aggiungiamo unique=True!
+    indirizzo = models.CharField(max_length=255)
+
+    # 👇 AGGIUNGIAMO IL NUOVO CAMPO
+    stato = models.CharField(
+        max_length=10,
+        choices=StatoHotel.choices,
+        default=StatoHotel.ATTIVO # Ogni nuovo hotel parte come ATTIVO
+    )
+
+    class Meta:
+        verbose_name = "Hotel"
+        verbose_name_plural = "Hotel" # Correggiamo anche il plurale in italiano
+
+    def __str__(self):
+        return self.nome
+
 
 class Stanza(models.Model):
+    class TipoStanza(models.TextChoices):
+        SINGOLA = 'SING', 'Singola'
+        MATRIMONIALE = 'MATR', 'Matrimoniale'
+        DOPPIA = 'DOPP', 'Doppia con Letti Singoli'
+        TRIPLA = "TRIP", 'Tripla'
+        SUITE = 'SUIT', 'Suite'
+
+    # 👇 LA NOSTRA NUOVA FOREIGN KEY!
+    # Il primo argomento è il modello genitore.
+    # on_delete=models.CASCADE è la regola di cancellazione.
+    # related_name ci servirà in futuro per le query inverse.
+    hotel = models.ForeignKey(Hotel, related_name='stanze', on_delete=models.PROTECT)
+
     # Il numero della stanza, es: 101, 202...
     numero = models.IntegerField()
 
     # La tipologia, es: "Singola", "Matrimoniale", "Suite"
     # max_length è obbligatorio per i CharField
-    tipologia = models.CharField(max_length=50)
+    tipologia = models.CharField(
+        max_length=4,
+        choices=TipoStanza.choices,
+        default=TipoStanza.MATRIMONIALE,
+    )
 
     # Quanti ospiti può accogliere al massimo
     ospiti_massimo = models.IntegerField()
@@ -25,5 +66,10 @@ class Stanza(models.Model):
     # Perfetto per noi: questo campo avrà valore solo se ha_problemi è True!
     descrizione_problema = models.TextField(blank=True, null=True)
 
+        # 👇 AGGIUNGIAMO QUESTA PARTE!
+    class Meta:
+        verbose_name = "Stanza"
+        verbose_name_plural = "Stanze"
+
     def __str__(self):
-        return f"Stanza N° {self.numero} - {self.tipologia}"
+        return f"Stanza N° {self.numero} ({self.tipologia}) - {self.hotel.nome}"

@@ -1,2 +1,30 @@
 /db.sqlite3
 /venv
+
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environment
+.env
+env/
+ENV/
+
+# IDE - VSCode
+.vscode/
+
+# Log files
+*.log
+logs/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
