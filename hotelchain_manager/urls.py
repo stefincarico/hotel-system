@@ -15,13 +15,26 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from gestione_hotel.views import homepage_view 
-from gestione_hotel.views import homepage_view, hotel_detail_view,hotel_create_view
+from django.urls import path, include
+
+from gestione_hotel.views import logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', homepage_view, name='homepage'),
-    path('hotel/<int:pk>/', hotel_detail_view, name='hotel_detail'),
-    path('hotel/nuovo/', hotel_create_view, name='hotel_create'),
+    # 👇 LA NOSTRA NUOVA, POTENTE RIGA!
+    # "Tutte le rotte che iniziano con 'hotel/' devono essere gestite
+    # dal file urls.py che si trova nell'app 'gestione_hotel'".
+    path('hotel/', include('gestione_hotel.urls', namespace='hotel')),
+    
+    # Per ora, potremmo voler mantenere una homepage "radice" del sito.
+    # Possiamo importare la view e creare una rotta apposita se vogliamo,
+    # oppure decidere che la lista hotel è la nostra homepage.
+    # Per semplicità, diciamo che la lista hotel è la nostra homepage
+    # per ora, e la deleghiamo sempre alla nostra app.
+    path('', include('gestione_hotel.urls')), # Potremmo fare così per la radice
+    
+    # Sovrascriviamo solo l'URL di logout per accettare GET
+    path('accounts/logout/', logout_view, name='logout'),
+    # Usiamo le view di default per il login, reset password etc
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

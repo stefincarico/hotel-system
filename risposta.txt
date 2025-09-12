@@ -1,0 +1,56 @@
+Ciao! Ho individuato la causa dell'errore 405 (Method Not Allowed) che stai riscontrando. 
+
+**1. Il Problema: L'ordine delle URL è importante**
+
+Nel tuo file `hotelchain_manager/urls.py`, hai definito le rotte in questo ordine:
+
+```python
+# hotelchain_manager/urls.py
+
+urlpatterns = [
+    # ... altre rotte
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/logout/', logout_view, name='logout'), # <-- QUESTA È LA RIGA PROBLEMATICA
+]
+```
+
+Django processa le rotte in ordine e si ferma alla prima che corrisponde. 
+
+1.  `path('accounts/', include('django.contrib.auth.urls'))` include tutte le rotte di autenticazione predefinite di Django. Tra queste, c'è una rotta per il logout (`/accounts/logout/`) che, per motivi di sicurezza, accetta **solo richieste POST**.
+2.  La tua rotta personalizzata, che dovrebbe gestire anche le richieste GET, viene definita *dopo*. 
+
+Di conseguenza, quando il browser invia una richiesta GET a `/accounts/logout/`, Django trova prima la rotta predefinita, vede che non accetta GET e restituisce l'errore 405, senza mai arrivare a considerare la tua view personalizzata.
+
+**2. La Soluzione: Invertire l'ordine**
+
+Per risolvere, dobbiamo semplicemente dire a Django di controllare la tua rotta personalizzata *prima* di quelle predefinite. 
+
+Ecco come modificare il file `hotelchain_manager/urls.py`:
+
+```python
+# hotelchain_manager/urls.py (corretto)
+
+from django.contrib import admin
+from django.urls import path, include
+from gestione_hotel.views import logout_view
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('hotel/', include('gestione_hotel.urls', namespace='hotel')),
+    path('', include('gestione_hotel.urls')),
+
+    # 👇 LA TUA ROTTA PERSONALIZZATA PRIMA DI QUELLE STANDARD
+    path('accounts/logout/', logout_view, name='logout'),
+
+    # ORA INCLUDIAMO LE ALTRE ROTTE DI AUTENTICAZIONE
+    path('accounts/', include('django.contrib.auth.urls')),
+]
+```
+
+**3. Cosa fa questa modifica?**
+
+Spostando `path('accounts/logout/', logout_view, name='logout')` prima di `include('django.contrib.auth.urls')`, garantiamo che qualsiasi richiesta a `/accounts/logout/` venga intercettata e gestita dalla tua `logout_view`, che accetta correttamente le richieste GET. Le altre rotte di autenticazione (login, cambio password, etc.) continueranno a funzionare come prima.
+
+**4. Prossimi Passi**
+
+Se vuoi, posso applicare questa modifica per te. Fammi sapere!

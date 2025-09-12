@@ -1,19 +1,38 @@
 <!-- templates/gestione_hotel/hotel_create.html -->
 
 {% extends "base.html" %}
-
+    
 {% block title %}
-    Crea Nuovo Hotel
+    <!-- Se abbiamo un hotel (siamo in modifica), usiamo il suo nome,
+         altrimenti usiamo il testo generico per la creazione -->
+    {% if hotel %}
+        Modifica {{ hotel.nome }}
+    {% else %}
+        Crea Nuovo Hotel
+    {% endif %}
 {% endblock %}
-
+    
 {% block content %}
-    <h2>➕ Crea un Nuovo Hotel</h2>
-
+    <!-- Anche qui, titolo dinamico -->
+    {% if hotel %}
+        <h2>✏️ Modifica Dati per: {{ hotel.nome }}</h2>
+    {% else %}
+        <h2>➕ Crea un Nuovo Hotel</h2>
+    {% endif %}
+    
     <form method="post">
-        {% csrf_token %} <!-- 🛡️ Il gettone di sicurezza! FONDAMENTALE! -->
-
-        {{ form.as_p }} <!-- 🪄 Django disegnerà il form per noi, un campo per paragrafo -->
-
-        <button type="submit">Salva Hotel</button>
+        {% csrf_token %}
+    
+        {{ form.as_p }}
+    
+        <button type="submit">Salva Modifiche</button>
     </form>
+
+    <!-- Aggiungiamo un link per annullare e tornare indietro -->
+    {% if hotel %}
+        <p><a href="{% url 'hotel:hotel_detail' hotel.pk %}">Annulla</a></p>
+                <a href="{% url 'hotel:hotel_delete' hotel.pk %}" style="color: red;">
+            Elimina questo hotel
+        </a>
+    {% endif %}
 {% endblock %}

@@ -7,7 +7,7 @@
 {% block content %}
     <!-- 👇 Aggiungiamo il link/bottone qui in alto! -->
     <p>
-        <a href="{% url 'hotel_create' %}" style="font-weight: bold; font-size: 1.1em;">
+        <a href="{% url 'hotel:hotel_create' %}" style="font-weight: bold; font-size: 1.1em;">
             ➕ Aggiungi Nuovo Hotel
         </a>
     </p>
@@ -19,7 +19,7 @@
             {% for hotel in hotels %}
                 <li>
                     <strong>
-                        <a href="{% url 'hotel_detail' hotel.pk %}">
+                        <a href="{% url 'hotel:hotel_detail' hotel.pk %}">
                             {{ hotel.nome }}
                         </a>
                     </strong> - {{ hotel.indirizzo }}

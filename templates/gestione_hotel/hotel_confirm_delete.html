@@ -1,0 +1,31 @@
+<!-- templates/gestione_hotel/hotel_confirm_delete.html -->
+
+{% extends "base.html" %}
+    
+{% block title %}
+    Conferma Eliminazione Hotel
+{% endblock %}
+    
+{% block content %}
+<h1 style="text-align: center; font-size: 150px;">🚨</h1>
+    <h2>☣️ Conferma Eliminazione</h2>
+    
+    <p>
+        Sei assolutamente sicuro di voler eliminare l'hotel
+        <strong>"{{ hotel.nome }}"</strong>?
+    </p>
+
+    <p style="color: red; font-weight: bold;">
+        ATTENZIONE: Questa azione è irreversibile!
+    </p>
+    
+    <form method="post">
+        {% csrf_token %} <!-- Sempre presente nei form! -->
+        
+        <button type-="submit">Sì, sono sicuro. Elimina.</button>
+        
+        <a href="{% url 'hotel:hotel_detail' hotel.pk %}" style="margin-left: 20px;">
+            No, annulla e torna indietro
+        </a>
+    </form>
+{% endblock %}

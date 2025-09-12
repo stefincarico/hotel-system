@@ -6,6 +6,9 @@
 
 {% block content %}
     <h2>🏨 Dettagli per: {{ hotel.nome }}</h2>
+    <a href="{% url 'hotel:hotel_update' hotel.pk %}" style="font-weight: bold;">
+    ✏️ Modifica
+</a>
     <p><strong>Indirizzo:</strong> {{ hotel.indirizzo }}</p>
     <p><strong>Stato:</strong> {{ hotel.get_stato_display }}</p>
 
@@ -29,5 +32,5 @@
     {% endif %}
 
     <br>
-    <a href="{% url 'homepage' %}">⬅️ Torna alla lista degli hotel</a>
+    <a href="{% url 'hotel:hotel_list' %}">⬅️ Torna alla lista degli hotel</a>
 {% endblock %}
