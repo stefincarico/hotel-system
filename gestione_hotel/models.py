@@ -2,6 +2,20 @@
 
 from django.db import models
 
+class HotelManager(models.Manager):
+    def get_queryset_for_user(self, user):
+        """
+        Restituisce la QuerySet di hotel filtrata per un utente specifico.
+        """
+        # Se l'utente è un superuser, può vedere tutto.
+        if user.is_superuser:
+            return super().get_queryset()
+        
+        # Altrimenti, restituiamo solo gli hotel a cui è abilitato.
+        # Usiamo 'user.userprofile' per accedere al profilo.
+        # Il .distinct() previene eventuali duplicati se ci fossero relazioni complesse.
+        return user.userprofile.allowed_hotels.all().distinct()
+
 # 👇 IL NOSTRO NUOVO MODELLO!
 class Hotel(models.Model):
     # 👇 DEFINIAMO GLI STATI POSSIBILI
@@ -19,6 +33,12 @@ class Hotel(models.Model):
         choices=StatoHotel.choices,
         default=StatoHotel.ATTIVO # Ogni nuovo hotel parte come ATTIVO
     )
+    # 👇 COLLEGIAMO IL MANAGER STANDARD E IL NOSTRO NUOVO MANAGER!
+    # Django ci dà sempre un manager di base chiamato 'objects'.
+    objects = models.Manager() 
+    # Ora aggiungiamo il nostro!
+    by_user = HotelManager()
+
 
     class Meta:
         verbose_name = "Hotel"

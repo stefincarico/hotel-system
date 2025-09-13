@@ -13,14 +13,12 @@ from django.contrib.auth.decorators import permission_required
 
 @login_required
 def homepage_view(request):
-    # Se l'utente è un superuser, può vedere tutto!
-    if request.user.is_superuser:
-        lista_hotel_attivi = Hotel.objects.filter(stato=Hotel.StatoHotel.ATTIVO).order_by('nome')
-    else:
-        # Altrimenti, filtriamo gli hotel dalla lista del suo profilo!
-        lista_hotel_attivi = request.user.userprofile.allowed_hotels.filter(
-            stato=Hotel.StatoHotel.ATTIVO
-        ).order_by('nome')
+    # 👇 GUARDA CHE PULIZIA!
+    # Chiamiamo il nostro nuovo manager, passandogli l'utente corrente.
+    # La logica superuser/utente normale è ora NASCOSTA dentro il manager.
+    lista_hotel_attivi = Hotel.by_user.get_queryset_for_user(request.user).filter(
+        stato=Hotel.StatoHotel.ATTIVO
+    ).order_by('nome')
 
     context = {
         'hotels': lista_hotel_attivi,
@@ -29,14 +27,12 @@ def homepage_view(request):
 
 @login_required
 def hotel_detail_view(request, pk):
-    # PRIMA di fare qualsiasi altra cosa, controlliamo se l'utente ha accesso a questo hotel.
-    # Se l'utente non è superuser, cerchiamo l'hotel SOLO tra quelli a lui permessi.
-    if request.user.is_superuser:
-        hotel = get_object_or_404(Hotel, pk=pk)
-    else:
-        hotel = get_object_or_404(request.user.userprofile.allowed_hotels, pk=pk)
+    # 👇 ANCHE QUI, USIAMO IL NUOVO MANAGER COME PUNTO DI PARTENZA
+    # per la nostra QuerySet sicura.
+    queryset_sicura = Hotel.by_user.get_queryset_for_user(request.user)
+    hotel = get_object_or_404(queryset_sicura, pk=pk)
 
-    # Il resto della view funziona come prima, perché abbiamo già l'hotel giusto!
+    # Il resto della view è identico...
     stanze_dell_hotel = hotel.stanze.all()
     context = {
         'hotel': hotel,
@@ -68,12 +64,10 @@ def hotel_create_view(request):
     }
     return render(request, 'gestione_hotel/hotel_create.html', context)
 
-@login_required
+@permission_required('gestione_hotel.change_hotel', raise_exception=True)
 def hotel_update_view(request, pk):
-    if request.user.is_superuser:
-        hotel = get_object_or_404(Hotel, pk=pk)
-    else:
-        hotel = get_object_or_404(request.user.userprofile.allowed_hotels, pk=pk)
+    queryset_sicura = Hotel.by_user.get_queryset_for_user(request.user)
+    hotel = get_object_or_404(queryset_sicura, pk=pk)
 
     # 2. Logica per il POST (identica alla create, ma con 'instance=hotel'!)
     if request.method == 'POST':
@@ -98,12 +92,10 @@ def hotel_update_view(request, pk):
     }
     return render(request, 'gestione_hotel/hotel_create.html', context)
 
-@login_required
+@permission_required('gestione_hotel.delete_hotel', raise_exception=True)
 def hotel_delete_view(request, pk):
-    if request.user.is_superuser:
-        hotel = get_object_or_404(Hotel, pk=pk)
-    else:
-        hotel = get_object_or_404(request.user.userprofile.allowed_hotels, pk=pk)
+    queryset_sicura = Hotel.by_user.get_queryset_for_user(request.user)
+    hotel = get_object_or_404(queryset_sicura, pk=pk)
 
     # 2. Se la richiesta è POST, l'utente ha confermato. Cancelliamo!
     if request.method == 'POST':
