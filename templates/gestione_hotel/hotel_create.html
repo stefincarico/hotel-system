@@ -1,6 +1,8 @@
 <!-- templates/gestione_hotel/hotel_create.html -->
 
 {% extends "base.html" %}
+<!-- 👇 1. Carichiamo il tag library di crispy in cima al file -->
+{% load crispy_forms_tags %}
     
 {% block title %}
     <!-- Se abbiamo un hotel (siamo in modifica), usiamo il suo nome,
@@ -23,9 +25,10 @@
     <form method="post">
         {% csrf_token %}
     
-        {{ form.as_p }}
+        <!-- 👇 2. SOSTITUIAMO {{ form.as_p }} CON QUESTO! -->
+        {{ form|crispy }}
     
-        <button type="submit">Salva Modifiche</button>
+        <button type="submit" class="btn btn-primary mt-3">Salva Modifiche</button>
     </form>
 
     <!-- Aggiungiamo un link per annullare e tornare indietro -->

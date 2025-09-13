@@ -1,0 +1,18 @@
+<!-- templates/booking/prenotazione_cancel_confirm.html -->
+{% extends "base.html" %}
+
+{% block title %}Annulla Prenotazione{% endblock %}
+
+{% block content %}
+    <h2>⚠️ Conferma Annullamento</h2>
+    <p>
+        Sei sicuro di voler annullare la prenotazione per <strong>{{ prenotazione.cliente }}</strong> 
+        nella stanza <strong>{{ prenotazione.stanza.numero }}</strong>
+        dal {{ prenotazione.data_check_in }} al {{ prenotazione.data_check_out }}?
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sì, annulla la prenotazione</button>
+        <a href="{% url 'hotel:hotel_detail' hotel.pk %}" class="btn btn-secondary">No, torna indietro</a>
+    </form>
+{% endblock %}

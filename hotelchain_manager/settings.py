@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'gestione_hotel',
     'accounts',
     'booking',
+
+    # 👇 LE NOSTRE NUOVE APP!
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
 MIDDLEWARE = [
@@ -126,3 +130,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/hotel/'
 LOGOUT_REDIRECT_URL = '/' # O '/accounts/login/' se preferisci
+
+# --- IMPOSTAZIONI PER DJANGO-CRISPY-FORMS ---
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"

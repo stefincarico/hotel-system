@@ -5,18 +5,21 @@
 {% endblock %}
 
 {% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
     <h2>🏨 Dettagli per: {{ hotel.nome }}</h2>
-    <a href="{% url 'hotel:hotel_update' hotel.pk %}" style="font-weight: bold;">
-    ✏️ Modifica
-</a>
-<a href="{% url 'booking:prenotazione_create' hotel.pk %}" style="font-weight: bold; color: green; margin-left:15px">
-    ➕ Nuova Prenotazione
-</a>
+    <div>
+        <!-- 👇 IL NOSTRO NUOVO LINK! -->
+        <a href="{% url 'hotel:hotel_dashboard' hotel.pk %}" class="btn btn-primary">
+            📊 Vai alla Dashboard
+        </a>
+        <a href="{% url 'hotel:hotel_update' hotel.pk %}" class="btn btn-secondary">
+            ✏️ Modifica
+        </a>
+    </div>
+</div>
     <p><strong>Indirizzo:</strong> {{ hotel.indirizzo }}</p>
     <p><strong>Stato:</strong> {{ hotel.get_stato_display }}</p>
-
     <hr>
-
     <h3>🚪 Stanze disponibili in questo hotel:</h3>
 
     {% if stanze %}
@@ -33,7 +36,47 @@
     {% else %}
         <p>😔 Non ci sono stanze associate a questo hotel.</p>
     {% endif %}
+<hr>
 
+<h3>🗓️ Prenotazioni per questo hotel:</h3>
+<a href="{% url 'booking:prenotazione_create' hotel.pk %}" style="font-weight: bold; color: green; margin-left:15px">
+    ➕ Nuova Prenotazione
+</a>
+<hr>
+{% if prenotazioni %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Stanza</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Stato</th>
+                <th>Azioni</th> 
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in prenotazioni %}
+            <tr>
+                <td>{{ p.cliente }}</td>
+                <td>{{ p.stanza.numero }}</td>
+                <td>{{ p.data_check_in }}</td>
+                <td>{{ p.data_check_out }}</td>
+                <td>{{ p.get_stato_display }}</td>
+                <!-- 👇 LA NUOVA COLONNA CON LE AZIONI -->
+                <td>
+                    {% if p.stato == 'CONFERMATA' %} <!-- Mostriamo i link solo se la prenotazione è attiva -->
+                        <a href="{% url 'booking:prenotazione_update' p.pk %}">Modifica</a> |
+                        <a href="{% url 'booking:prenotazione_cancel' p.pk %}" style="color:red;">Annulla</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Nessuna prenotazione trovata per questo hotel.</p>
+{% endif %}
     <br>
     <a href="{% url 'hotel:hotel_list' %}">⬅️ Torna alla lista degli hotel</a>
 {% endblock %}

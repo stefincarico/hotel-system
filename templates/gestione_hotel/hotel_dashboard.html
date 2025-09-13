@@ -1,0 +1,71 @@
+<!-- templates/gestione_hotel/hotel_dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ hotel.nome }}{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>📊 Dashboard Operativa</h2>
+            <h4 class="text-muted">{{ hotel.nome }}</h4>
+        </div>
+        <div>
+            <span class="badge bg-primary fs-5">Oggi: {{ data_odierna|date:"d M Y" }}</span>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Colonna Arrivi -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header fs-5">⇣ Arrivi di Oggi ({{ arrivi_oggi.count }})</div>
+                <ul class="list-group list-group-flush">
+                    {% for p in arrivi_oggi %}
+                        <li class="list-group-item">
+                            <strong>{{ p.cliente }}</strong> - St. {{ p.stanza.numero }}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">Nessun arrivo previsto per oggi.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Colonna Partenze -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header fs-5">⇡ Partenze di Oggi ({{ partenze_oggi.count }})</div>
+                <ul class="list-group list-group-flush">
+                    {% for p in partenze_oggi %}
+                        <li class="list-group-item">
+                            <strong>{{ p.cliente }}</strong> - St. {{ p.stanza.numero }}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">Nessuna partenza prevista per oggi.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Colonna Ospiti Presenti -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header fs-5">🏨 Ospiti in Hotel ({{ ospiti_presenti.count }})</div>
+                <ul class="list-group list-group-flush">
+                    {% for p in ospiti_presenti %}
+                        <li class="list-group-item">
+                            <strong>{{ p.cliente }}</strong> - St. {{ p.stanza.numero }} (fino al {{ p.data_check_out|date:"d/m" }})
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">Nessun ospite presente.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'hotel:hotel_detail' hotel.pk %}" class="btn btn-secondary">Torna a Dettaglio Hotel</a>
+    </div>
+
+{% endblock %}
