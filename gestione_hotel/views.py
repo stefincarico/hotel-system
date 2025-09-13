@@ -7,47 +7,44 @@ from django.contrib.auth.decorators import login_required # 👈 1. Importiamo i
 from django.contrib.auth import logout
 from django.contrib import messages 
 from .decorators import custom_login_required
+from django.contrib.auth.decorators import permission_required
 
 # Create your views here.
 
+@login_required
 def homepage_view(request):
-    # 2. Questa è la nostra logica: prendiamo TUTTI gli hotel
-    #    ma li filtriamo per avere solo quelli ATTIVI!
-    #    L'ordinamento per nome è un tocco di classe.
-    lista_hotel_attivi = Hotel.objects.filter(stato=Hotel.StatoHotel.ATTIVO).order_by('nome')
+    # Se l'utente è un superuser, può vedere tutto!
+    if request.user.is_superuser:
+        lista_hotel_attivi = Hotel.objects.filter(stato=Hotel.StatoHotel.ATTIVO).order_by('nome')
+    else:
+        # Altrimenti, filtriamo gli hotel dalla lista del suo profilo!
+        lista_hotel_attivi = request.user.userprofile.allowed_hotels.filter(
+            stato=Hotel.StatoHotel.ATTIVO
+        ).order_by('nome')
 
-    # 3. Prepariamo il "contesto", cioè i dati da inviare al template.
-    #    È un dizionario: la chiave 'hotels' sarà il nome che useremo nel template.
     context = {
         'hotels': lista_hotel_attivi,
     }
-
-    # 4. Diciamo a Django di "renderizzare" (costruire) la risposta.
-    #    Gli passiamo la richiesta, il nome del template che vogliamo usare,
-    #    e i dati (il contesto).
     return render(request, 'gestione_hotel/homepage.html', context)
 
-
-# 👇 LA NOSTRA NUOVA VIEW!
+@login_required
 def hotel_detail_view(request, pk):
-    # 1. Recuperiamo l'hotel specifico usando il pk dall'URL.
-    #    Se non esiste, Django mostrerà una pagina 404.
-    hotel = get_object_or_404(Hotel, pk=pk)
+    # PRIMA di fare qualsiasi altra cosa, controlliamo se l'utente ha accesso a questo hotel.
+    # Se l'utente non è superuser, cerchiamo l'hotel SOLO tra quelli a lui permessi.
+    if request.user.is_superuser:
+        hotel = get_object_or_404(Hotel, pk=pk)
+    else:
+        hotel = get_object_or_404(request.user.userprofile.allowed_hotels, pk=pk)
 
-    # 2. Recuperiamo TUTTE le stanze collegate a QUESTO hotel.
-    #    Ricordi il related_name='stanze' nel modello Stanza? Eccolo in azione!
+    # Il resto della view funziona come prima, perché abbiamo già l'hotel giusto!
     stanze_dell_hotel = hotel.stanze.all()
-
-    # 3. Prepariamo il contesto per il template.
     context = {
         'hotel': hotel,
         'stanze': stanze_dell_hotel,
     }
-
-    # 4. Renderizziamo il nuovo template di dettaglio
     return render(request, 'gestione_hotel/hotel_detail.html', context)
 
-@custom_login_required
+@permission_required('gestione_hotel.add_hotel', raise_exception=True)
 def hotel_create_view(request):
     # 2. Logica per gestire il POST (invio dati)
     if request.method == 'POST':
@@ -71,10 +68,12 @@ def hotel_create_view(request):
     }
     return render(request, 'gestione_hotel/hotel_create.html', context)
 
-@custom_login_required
+@login_required
 def hotel_update_view(request, pk):
-    # 1. Recuperiamo l'istanza dell'hotel che vogliamo modificare
-    hotel = get_object_or_404(Hotel, pk=pk)
+    if request.user.is_superuser:
+        hotel = get_object_or_404(Hotel, pk=pk)
+    else:
+        hotel = get_object_or_404(request.user.userprofile.allowed_hotels, pk=pk)
 
     # 2. Logica per il POST (identica alla create, ma con 'instance=hotel'!)
     if request.method == 'POST':
@@ -99,10 +98,12 @@ def hotel_update_view(request, pk):
     }
     return render(request, 'gestione_hotel/hotel_create.html', context)
 
-@custom_login_required
+@login_required
 def hotel_delete_view(request, pk):
-    # 1. Recuperiamo l'oggetto o mostriamo un 404
-    hotel = get_object_or_404(Hotel, pk=pk)
+    if request.user.is_superuser:
+        hotel = get_object_or_404(Hotel, pk=pk)
+    else:
+        hotel = get_object_or_404(request.user.userprofile.allowed_hotels, pk=pk)
 
     # 2. Se la richiesta è POST, l'utente ha confermato. Cancelliamo!
     if request.method == 'POST':

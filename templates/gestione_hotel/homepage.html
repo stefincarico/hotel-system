@@ -6,11 +6,15 @@
 
 {% block content %}
     <!-- 👇 Aggiungiamo il link/bottone qui in alto! -->
-    <p>
-        <a href="{% url 'hotel:hotel_create' %}" style="font-weight: bold; font-size: 1.1em;">
-            ➕ Aggiungi Nuovo Hotel
-        </a>
-    </p>
+    <!-- 👇 IL NOSTRO CONTROLLO SUI PERMESSI! -->
+    {% if perms.gestione_hotel.add_hotel %}
+        <p>
+            <a href="{% url 'hotel:hotel_create' %}" style="font-weight: bold; font-size: 1.1em;">
+                ➕ Aggiungi Nuovo Hotel
+            </a>
+        </p>
+        <hr>
+    {% endif %}
     <hr>
     <h2>I nostri hotel attivi:</h2>
 
