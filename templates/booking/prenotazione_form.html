@@ -1,0 +1,19 @@
+<!-- templates/booking/prenotazione_form.html -->
+{% extends "base.html" %}
+
+{% block title %}Nuova Prenotazione per {{ hotel.nome }}{% endblock %}
+
+{% block content %}
+    <h2>🏨 Nuova Prenotazione per: {{ hotel.nome }}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Crea Prenotazione</button>
+        <!-- 👇 IL NOSTRO NUOVO PULSANTE/LINK -->
+        <a href="{% url 'hotel:hotel_detail' hotel.pk %}" 
+           style="margin-left: 15px; color: #555; text-decoration: none;">
+            Annulla
+        </a>
+    </form>
+{% endblock %}

@@ -37,4 +37,6 @@ urlpatterns = [
     path('accounts/logout/', logout_view, name='logout'),
     # Usiamo le view di default per il login, reset password etc
     path('accounts/', include('django.contrib.auth.urls')),
+
+    path('booking/', include('booking.urls', namespace='booking')),
 ]

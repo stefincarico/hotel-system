@@ -9,6 +9,9 @@
     <a href="{% url 'hotel:hotel_update' hotel.pk %}" style="font-weight: bold;">
     ✏️ Modifica
 </a>
+<a href="{% url 'booking:prenotazione_create' hotel.pk %}" style="font-weight: bold; color: green; margin-left:15px">
+    ➕ Nuova Prenotazione
+</a>
     <p><strong>Indirizzo:</strong> {{ hotel.indirizzo }}</p>
     <p><strong>Stato:</strong> {{ hotel.get_stato_display }}</p>
 
