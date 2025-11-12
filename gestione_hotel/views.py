@@ -10,6 +10,7 @@ from django.contrib import messages
 from .decorators import custom_login_required
 from django.contrib.auth.decorators import permission_required
 from django.utils import timezone
+from datetime import timedelta
 
 # Create your views here.
 
@@ -155,3 +156,60 @@ def hotel_dashboard_view(request, pk):
     }
 
     return render(request, 'gestione_hotel/hotel_dashboard.html', context)
+
+
+@login_required
+def hotel_planner_view(request, pk):
+    # 1. Recupero sicuro dell'hotel
+    queryset_sicura = Hotel.by_user.get_queryset_for_user(request.user)
+    hotel = get_object_or_404(queryset_sicura, pk=pk)
+
+    # 2. Definizione dell'intervallo di date (prossimi 7 giorni)
+    oggi = timezone.now().date()
+    date_future = [oggi + timedelta(days=i) for i in range(7)]
+
+    # 3. Query UNICA e OTTIMIZZATA per tutte le prenotazioni rilevanti
+    prenotazioni_rilevanti = hotel.prenotazioni.filter(
+        stato='CONFERMATA',
+        data_check_in__lte=date_future[-1], # Che iniziano prima della fine del nostro intervallo
+        data_check_out__gte=oggi           # E finiscono dopo l'inizio del nostro intervallo
+    ).select_related('stanza', 'cliente') # Ottimizzazione: pre-carica i dati correlati!
+
+    # 4. Costruzione della struttura dati per il template
+    planner_data = []
+    stanze_hotel = hotel.stanze.all().order_by('numero')
+
+    for stanza in stanze_hotel:
+        riga_stanza = {
+            'stanza': stanza,
+            'giorni': []
+        }
+        for giorno in date_future:
+            stato_giorno = 'libero'
+            prenotazione_del_giorno = None
+
+            # Controlliamo se c'è una prenotazione per questa stanza in questo giorno
+            for p in prenotazioni_rilevanti:
+                if p.stanza == stanza and p.data_check_in <= giorno < p.data_check_out:
+                    prenotazione_del_giorno = p
+                    if p.data_check_in == giorno:
+                        stato_giorno = 'arrivo'
+                    elif p.data_check_out == giorno + timedelta(days=1):
+                        stato_giorno = 'partenza' # Partenza se il check-out è il giorno dopo
+                    else:
+                        stato_giorno = 'occupato'
+                    break # Trovata la prenotazione, usciamo dal ciclo interno
+
+            riga_stanza['giorni'].append({
+                'data': giorno,
+                'stato': stato_giorno,
+                'prenotazione': prenotazione_del_giorno
+            })
+        planner_data.append(riga_stanza)
+
+    context = {
+        'hotel': hotel,
+        'planner_data': planner_data,
+        'header_date': date_future,
+    }
+    return render(request, 'gestione_hotel/hotel_planner.html', context)

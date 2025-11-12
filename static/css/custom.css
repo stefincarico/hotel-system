@@ -1,0 +1,31 @@
+/* static/css/custom.css */
+
+.planner-table { 
+    table-layout: fixed; 
+}
+.planner-table th, .planner-table td { 
+    text-align: center; 
+    vertical-align: middle; 
+}
+.planner-table .stato-libero { 
+    background-color: #e9f7ef; 
+}
+.planner-table .stato-arrivo { 
+    background-color: #d1ecf1; 
+    font-weight: bold; 
+    border-left: 3px solid #0c5460; 
+}
+.planner-table .stato-partenza { 
+    background-color: #fff3cd; 
+    font-weight: bold; 
+    border-right: 3px solid #856404; 
+}
+.planner-table .stato-occupato { 
+    background-color: #f8d7da; 
+}
+.planner-table td a { 
+    color: #333; 
+    text-decoration: none; 
+    display: block; 
+    height: 100%; 
+}

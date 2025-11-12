@@ -7,7 +7,8 @@ from .views import (
     hotel_create_view,
     hotel_update_view,
     hotel_delete_view,
-    hotel_dashboard_view 
+    hotel_dashboard_view,
+    hotel_planner_view #
 )
 
 # Questo è importante per il namespacing che vedremo dopo!
@@ -22,4 +23,5 @@ urlpatterns = [
     path('<int:pk>/modifica/', hotel_update_view, name='hotel_update'),
     path('<int:pk>/elimina/', hotel_delete_view, name='hotel_delete'),
     path('<int:pk>/dashboard/', hotel_dashboard_view, name='hotel_dashboard'),
+    path('<int:pk>/planner/', hotel_planner_view, name='hotel_planner'),
 ]

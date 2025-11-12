@@ -1,0 +1,45 @@
+<!-- templates/gestione_hotel/hotel_planner.html -->
+{% extends "base.html" %}
+
+{% block title %}Planner Occupazioni - {{ hotel.nome }}{% endblock %}
+
+{% block content %}
+    <h2>📅 Planner Occupazioni</h2>
+    <h4 class="text-muted">{{ hotel.nome }}</h4>
+
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered planner-table">
+            <thead>
+                <tr>
+                    <th>Stanza</th>
+                    {% for data in header_date %}
+                        <th>{{ data|date:"D d/m" }}</th> <!-- Sab 26/10 -->
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- CICLO ESTERNO per le righe (stanze) -->
+                {% for riga in planner_data %}
+                <tr>
+                    <td><strong>{{ riga.stanza.numero }}</strong></td>
+                    
+                    <!-- CICLO INTERNO per le celle (giorni) -->
+                    {% for giorno in riga.giorni %}
+                        <td class="stato-{{ giorno.stato }}">
+                            {% if giorno.prenotazione %}
+                                <a href="#" title="Cliente: {{ giorno.prenotazione.cliente }}">
+                                    {{ giorno.prenotazione.cliente.cognome }}
+                                </a>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'hotel:hotel_dashboard' hotel.pk %}" class="btn btn-secondary">Torna alla Dashboard</a>
+    </div>
+{% endblock %}
